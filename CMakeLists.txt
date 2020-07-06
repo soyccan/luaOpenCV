@@ -22,7 +22,7 @@ include_directories(BEFORE ${OpenCV_INCLUDE_DIRS})
 if(MSVC)
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 else(MSVC)
- set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 endif(MSVC)
 
 

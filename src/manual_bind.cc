@@ -6,13 +6,12 @@
 
 #include "cv_bind_type_traits.hpp"
 
+#include <memory>
+
 namespace gen_wrap_cv {
 using namespace cv;
-template <typename T>
-struct identity {
-  typedef T type;
-};
-}
+template <typename T> struct identity { typedef T type; };
+} // namespace gen_wrap_cv
 
 namespace {
 namespace WrapCvType {
@@ -25,16 +24,13 @@ int WCV_8SC(int ch) { return CV_8SC(ch); }
 int WCV_8UC(int ch) { return CV_8UC(ch); }
 int matDepth(int depth) { return CV_MAT_DEPTH(depth); }
 int makeType(int depth, int channels) { return CV_MAKE_TYPE(depth, channels); }
-}
-}
+} // namespace WrapCvType
+} // namespace
 
 namespace wrap {
 namespace Mat {
 
-template <typename T>
-struct identity {
-  typedef T type;
-};
+template <typename T> struct identity { typedef T type; };
 
 using namespace cv;
 identity<bool (cv::Mat::*)() const>::type isSubmatrix = &cv::Mat::isSubmatrix;
@@ -48,16 +44,18 @@ identity<cv::MatExpr (cv::Mat::*)() const>::type t = &cv::Mat::t;
 KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(ptr_wrap_obj0, cv::Mat, ptr, 0,
                                                 1, uchar *(cv::Mat::*)(int));
 auto ptr0 = ptr_wrap_obj0();
-KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(
-    ptr_wrap_obj1, cv::Mat, ptr, 0, 1, const uchar *(cv::Mat::*)(int)const);
+KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(ptr_wrap_obj1, cv::Mat, ptr, 0,
+                                                1,
+                                                const uchar *(cv::Mat::*)(int)
+                                                    const);
 auto ptr1 = ptr_wrap_obj1();
 identity<uchar *(cv::Mat::*)(int, int)>::type ptr2 = &cv::Mat::ptr;
-identity<const uchar *(cv::Mat::*)(int, int)const>::type ptr3 = &cv::Mat::ptr;
+identity<const uchar *(cv::Mat::*)(int, int) const>::type ptr3 = &cv::Mat::ptr;
 identity<uchar *(cv::Mat::*)(int, int, int)>::type ptr4 = &cv::Mat::ptr;
-identity<const uchar *(cv::Mat::*)(int, int, int)const>::type ptr5 =
+identity<const uchar *(cv::Mat::*)(int, int, int) const>::type ptr5 =
     &cv::Mat::ptr;
 identity<uchar *(cv::Mat::*)(const int *)>::type ptr6 = &cv::Mat::ptr;
-identity<const uchar *(cv::Mat::*)(const int *)const>::type ptr7 =
+identity<const uchar *(cv::Mat::*)(const int *) const>::type ptr7 =
     &cv::Mat::ptr;
 auto ptr = kaguya::overload(ptr0, ptr1, ptr2, ptr3, ptr4, ptr5, ptr6, ptr7);
 identity<void (cv::Mat::*)()>::type deallocate = &cv::Mat::deallocate;
@@ -76,8 +74,9 @@ identity<void (cv::Mat::*)(const cv::Mat &)>::type copySize =
     &cv::Mat::copySize;
 identity<size_t (cv::Mat::*)() const>::type elemSize1 = &cv::Mat::elemSize1;
 KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(diag_wrap_obj0, cv::Mat, diag,
-                                                0, 1, cv::Mat (cv::Mat::*)(int)
-                                                          const);
+                                                0, 1,
+                                                cv::Mat (cv::Mat::*)(int)
+                                                    const);
 auto diag0 = diag_wrap_obj0();
 identity<cv::Mat (*)(const cv::Mat &)>::type diag1 = &cv::Mat::diag;
 auto diag = kaguya::overload(diag0, diag1);
@@ -136,8 +135,9 @@ KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(pop_back_wrap_obj, cv::Mat,
 auto pop_back = pop_back_wrap_obj();
 identity<size_t (cv::Mat::*)() const>::type elemSize = &cv::Mat::elemSize;
 KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(inv_wrap_obj, cv::Mat, inv, 0,
-                                                1, cv::MatExpr (cv::Mat::*)(int)
-                                                       const);
+                                                1,
+                                                cv::MatExpr (cv::Mat::*)(int)
+                                                    const);
 auto inv = inv_wrap_obj();
 identity<cv::Mat (cv::Mat::*)(int) const>::type row = &cv::Mat::row;
 identity<void (cv::Mat::*)(const void *)>::type push_back_ =
@@ -182,20 +182,20 @@ std::vector<int> size_getter(const cv::Mat *m) {
 template <typename T, typename... index>
 kaguya::AnyDataPusher at_depth_wrap(const cv::Mat &m, index... i) {
   switch (m.channels()) {
-    case 1:
-      return T(m.at<T>(i...));
-#define CASE_CHANNEL(NUM) \
-  case NUM:               \
-    return cv::Vec<T, NUM>(m.at<cv::Vec<T, NUM> >(i...))
-      CASE_CHANNEL(2);
-      CASE_CHANNEL(3);
-      CASE_CHANNEL(4);
-      CASE_CHANNEL(5);
-      CASE_CHANNEL(6);
-      CASE_CHANNEL(7);
-      CASE_CHANNEL(8);
-      CASE_CHANNEL(9);
-      CASE_CHANNEL(10);
+  case 1:
+    return T(m.at<T>(i...));
+#define CASE_CHANNEL(NUM)                                                      \
+  case NUM:                                                                    \
+    return cv::Vec<T, NUM>(m.at<cv::Vec<T, NUM>>(i...))
+    CASE_CHANNEL(2);
+    CASE_CHANNEL(3);
+    CASE_CHANNEL(4);
+    CASE_CHANNEL(5);
+    CASE_CHANNEL(6);
+    CASE_CHANNEL(7);
+    CASE_CHANNEL(8);
+    CASE_CHANNEL(9);
+    CASE_CHANNEL(10);
 #undef CASE_CHANNEL
   }
   throw kaguya::LuaTypeMismatch();
@@ -204,20 +204,20 @@ kaguya::AnyDataPusher at_depth_wrap(const cv::Mat &m, index... i) {
 template <typename... index>
 kaguya::AnyDataPusher at_wrap(const cv::Mat &m, index... i) {
   switch (m.depth()) {
-    case CV_8U:
-      return at_depth_wrap<uint8_t>(m, i...);
-    case CV_8S:
-      return at_depth_wrap<int8_t>(m, i...);
-    case CV_16U:
-      return at_depth_wrap<uint16_t>(m, i...);
-    case CV_16S:
-      return at_depth_wrap<int16_t>(m, i...);
-    case CV_32S:
-      return at_depth_wrap<int32_t>(m, i...);
-    case CV_32F:
-      return at_depth_wrap<float>(m, i...);
-    case CV_64F:
-      return at_depth_wrap<double>(m, i...);
+  case CV_8U:
+    return at_depth_wrap<uint8_t>(m, i...);
+  case CV_8S:
+    return at_depth_wrap<int8_t>(m, i...);
+  case CV_16U:
+    return at_depth_wrap<uint16_t>(m, i...);
+  case CV_16S:
+    return at_depth_wrap<int16_t>(m, i...);
+  case CV_32S:
+    return at_depth_wrap<int32_t>(m, i...);
+  case CV_32F:
+    return at_depth_wrap<float>(m, i...);
+  case CV_64F:
+    return at_depth_wrap<double>(m, i...);
   }
   throw kaguya::LuaTypeMismatch();
 }
@@ -236,9 +236,9 @@ kaguya::AnyDataPusher at_array(const cv::Mat &m, std::vector<int> index) {
 template <typename T, typename... index>
 void set_depth_wrap(cv::Mat &m, const kaguya::LuaStackRef &v, index... i) {
   switch (m.channels()) {
-#define CASE_CHANNEL(NUM)                                     \
-  case NUM:                                                   \
-    m.at<cv::Vec<T, NUM> >(i...) = v.get<cv::Vec<T, NUM> >(); \
+#define CASE_CHANNEL(NUM)                                                      \
+  case NUM:                                                                    \
+    m.at<cv::Vec<T, NUM>>(i...) = v.get<cv::Vec<T, NUM>>();                    \
     return
     CASE_CHANNEL(1);
     CASE_CHANNEL(2);
@@ -258,20 +258,20 @@ void set_depth_wrap(cv::Mat &m, const kaguya::LuaStackRef &v, index... i) {
 template <typename... index>
 void set_wrap(cv::Mat &m, const kaguya::LuaStackRef &v, index... i) {
   switch (m.depth()) {
-    case CV_8U:
-      return set_depth_wrap<uint8_t>(m, v, i...);
-    case CV_8S:
-      return set_depth_wrap<int8_t>(m, v, i...);
-    case CV_16U:
-      return set_depth_wrap<uint16_t>(m, v, i...);
-    case CV_16S:
-      return set_depth_wrap<int16_t>(m, v, i...);
-    case CV_32S:
-      return set_depth_wrap<int32_t>(m, v, i...);
-    case CV_32F:
-      return set_depth_wrap<float>(m, v, i...);
-    case CV_64F:
-      return set_depth_wrap<double>(m, v, i...);
+  case CV_8U:
+    return set_depth_wrap<uint8_t>(m, v, i...);
+  case CV_8S:
+    return set_depth_wrap<int8_t>(m, v, i...);
+  case CV_16U:
+    return set_depth_wrap<uint16_t>(m, v, i...);
+  case CV_16S:
+    return set_depth_wrap<int16_t>(m, v, i...);
+  case CV_32S:
+    return set_depth_wrap<int32_t>(m, v, i...);
+  case CV_32F:
+    return set_depth_wrap<float>(m, v, i...);
+  case CV_64F:
+    return set_depth_wrap<double>(m, v, i...);
   }
   throw kaguya::LuaTypeMismatch();
 }
@@ -354,8 +354,84 @@ int Mat_newindex_function(lua_State *L) {
   }
   return 0;
 }
-}  // end of namespace Mat
+
+// added
+// Stack Indices:
+//    (bottom) 1 2 3 ... n (top)
+//    (bottom) -n ...   -1 (top)
+// Example:
+//    /* call a function `f' defined in Lua */
+//    double f (double x, double y) {
+//      double z;
+//
+//      /* push functions and arguments */
+//      lua_getglobal(L, "f");  /* function to be called */
+//      lua_pushnumber(L, x);   /* push 1st argument */
+//      lua_pushnumber(L, y);   /* push 2nd argument */
+//
+//      /* do the call (2 arguments, 1 result) */
+//      if (lua_pcall(L, 2, 1, 0) != 0)
+//        error(L, "error running function `f': %s",
+//                 lua_tostring(L, -1));
+//
+//      /* retrieve result */
+//      if (!lua_isnumber(L, -1))
+//        error(L, "function `f' must return a number");
+//      z = lua_tonumber(L, -1);
+//      lua_pop(L, 1);  /* pop returned value */
+//      return z;
+//    }
+template <typename T>
+kaguya::AnyDataPusher max_depth_wrap(const cv::Mat &m, int flag) {
+  int x = 0, y = 0;
+  T res = T(m.at<T>(0, 0));
+  for (int i = 0; i < m.rows; i++) {
+    for (int j = 0; j < m.cols; j++) {
+      T val = T(m.at<T>(i, j));
+      if (val > res) {
+        res = val;
+        x = i;
+        y = j;
+      }
+    }
+  }
+  if (flag == 0)
+    return res;
+  else if (flag == 1)
+    return x;
+  else if (flag == 2)
+    return y;
+  else {
+    // TODO: better exception to throw?
+    throw kaguya::LuaTypeMismatch();
+    // TODO: how to return nil?
+    return nullptr;
+  }
 }
+kaguya::AnyDataPusher max_wrap(const cv::Mat &m, int flag) {
+  switch (m.depth()) {
+  case CV_8U:
+    return max_depth_wrap<uint8_t>(m, flag);
+  case CV_8S:
+    return max_depth_wrap<int8_t>(m, flag);
+  case CV_16U:
+    return max_depth_wrap<uint16_t>(m, flag);
+  case CV_16S:
+    return max_depth_wrap<int16_t>(m, flag);
+  case CV_32S:
+    return max_depth_wrap<int32_t>(m, flag);
+  case CV_32F:
+    return max_depth_wrap<float>(m, flag);
+  case CV_64F:
+    return max_depth_wrap<double>(m, flag);
+  }
+  throw kaguya::LuaTypeMismatch();
+}
+kaguya::AnyDataPusher max(const cv::Mat &m) { return max_wrap(m, 0); }
+kaguya::AnyDataPusher maxx(const cv::Mat &m) { return max_wrap(m, 1); }
+kaguya::AnyDataPusher maxy(const cv::Mat &m) { return max_wrap(m, 2); }
+} // end of namespace Mat
+} // namespace wrap
 
 KAGUYA_FUNCTION_OVERLOADS_WITH_SIGNATURE(scalar_factory, cv::Scalar, 0, 4,
                                          cv::Scalar(double, double, double,
@@ -584,6 +660,11 @@ void kaguya_manual_bind() {
       .add_static_property("__newindex",
                            luacfunction(wrap::Mat::Mat_newindex_function))
 
+      // added
+      .class_function("max", wrap::Mat::max)
+      .class_function("maxx", wrap::Mat::maxx)
+      .class_function("maxy", wrap::Mat::maxy)
+
       ;
 
   class_<cv::Scalar>("Scalar")
@@ -598,4 +679,3 @@ void kaguya_manual_bind() {
     return cv::Rect(x, y, height, width);
   });
 }
-
